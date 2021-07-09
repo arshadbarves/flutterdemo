@@ -1,10 +1,11 @@
 import 'dart:isolate';
 import 'dart:ui';
 
+import 'package:another_flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:filesize/filesize.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
-import 'package:videodown/Models/ydMReponse.dart';
+import 'package:videodown/Models/yDMVideoResponse.dart';
 import 'package:videodown/Services/downloadService.dart';
 import 'package:videodown/Services/youtubeService.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
@@ -65,8 +66,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: Center(
-            child: Column(
+        child: Column(
           children: [
             TextField(
               decoration: InputDecoration(hintText: "Search"),
@@ -75,7 +75,7 @@ class _HomePageState extends State<HomePage> {
               }),
             ),
           ],
-        )),
+        ),
       ),
     );
   }
@@ -87,65 +87,127 @@ class _HomePageState extends State<HomePage> {
       enableDrag: true,
       bounce: true,
       closeProgressThreshold: 0.5,
-      builder: (context) => Column(
-        children: [
-          Container(
-            margin: EdgeInsets.all(30),
-            child: Text(
-              "Download Options",
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w200),
+      builder: (context) => Expanded(
+        child: Column(
+          children: [
+            Container(
+              margin: EdgeInsets.all(30),
+              child: Text(
+                "Download Options",
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w200),
+              ),
             ),
-          ),
-          Container(
-            child: FutureBuilder(
-              future: youTubeService.getRequest(url),
-              builder: (BuildContext context,
-                  AsyncSnapshot<List<VideoList>> snapshot) {
-                if (snapshot.data == null) {
-                  return Container(child: CircularProgressIndicator());
-                } else {
-                  return Expanded(
-                    child: Container(
-                      child: ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: snapshot.data!.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          var video = snapshot.data![index];
-                          return Card(
-                            child: ListTile(
-                              leading: CircleAvatar(
-                                  //   backgroundImage:
-                                  //       NetworkImage(snapshot.data[index].picture),
-                                  ),
-                              title: Wrap(
-                                spacing: 10.0,
-                                children: [
-                                  Text(video.format.toString(),
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold)),
-                                  Text(video.ext.toString(),
-                                      style: TextStyle(
-                                          // fontWeight: FontWeight.w300
-
-                                          )),
-                                ],
+            Container(
+              child: FutureBuilder(
+                future: youTubeService.getRequest(url),
+                builder: (BuildContext context,
+                    AsyncSnapshot<List<VideoDetails>> snapshot) {
+                  if (snapshot.data == null) {
+                    return Container(child: CircularProgressIndicator());
+                  } else if (snapshot.data![0].status == false) {
+                    return Container(
+                      child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Text(snapshot.data![0].message),
+                            SizedBox(height: 50),
+                            OutlineButton(
+                              child: Text(
+                                "Close",
                               ),
-                              subtitle: Text(filesize(video.filesize.toInt())),
-                              onTap: () {
-                                downloadService.downloadRequest(video.url);
+                              highlightedBorderColor: Colors.red,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(15)),
+                              onPressed: () {
                                 Navigator.pop(context);
                               },
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  );
-                }
-              },
+                            )
+                          ]),
+                    );
+                  } else {
+                    return Wrap(
+                      // shrinkWrap: true,
+                      children: [
+                        Text('Audio'),
+                        SizedBox(
+                          child: ListView.builder(
+                            shrinkWrap: true,
+                            scrollDirection: Axis.vertical,
+                            itemCount: snapshot.data![0].audioFormat.length,
+                            itemBuilder: (BuildContext context, int index) {
+                              var video = snapshot.data![0].audioFormat[index];
+                              return Card(
+                                child: ListTile(
+                                  title: Wrap(
+                                    spacing: 10.0,
+                                    children: [
+                                      Text(video.quality.toString(),
+                                          style: TextStyle(
+                                              // fontWeight: FontWeight.bold
+                                              )),
+                                      Text(video.ext.toString(),
+                                          style: TextStyle(
+                                              // fontWeight: FontWeight.w300
+
+                                              )),
+                                    ],
+                                  ),
+                                  subtitle: Text(filesize(video.size)),
+                                  onTap: () {
+                                    downloadService.downloadRequest(video.url,
+                                        snapshot.data![0].title, video.ext);
+                                    Navigator.pop(context);
+                                  },
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                        Text('Video'),
+                        SizedBox(
+                          child: ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: snapshot.data![0].videoFormat.length,
+                            itemBuilder: (BuildContext context, int index) {
+                              var video = snapshot.data![0].videoFormat[index];
+                              return Card(
+                                child: ListTile(
+                                  title: Wrap(
+                                    spacing: 10.0,
+                                    children: [
+                                      Text(video.quality.toString(),
+                                          style: TextStyle(
+                                              // fontWeight: FontWeight.bold
+                                              )),
+                                      Text(video.ext.toString(),
+                                          style: TextStyle(
+                                              // fontWeight: FontWeight.w300
+
+                                              )),
+                                    ],
+                                  ),
+                                  subtitle: Text(filesize(video.size)),
+                                  onTap: () {
+                                    downloadService.downloadRequest(
+                                        video.url,
+                                        snapshot.data![0].title + video.quality,
+                                        video.ext);
+                                    Navigator.pop(context);
+                                  },
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ],
+                    );
+                  }
+                },
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

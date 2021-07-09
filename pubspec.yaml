@@ -39,7 +39,11 @@ dependencies:
   permission_handler: ^8.1.2
   path_provider: ^2.0.2
   receive_sharing_intent: ^1.4.5
-
+  system_alert_window: ^0.5.0
+  another_flushbar: ^1.10.24
+  double_back_to_close: ^2.0.0
+  get: ^4.1.4
+  # downloads_path_provider_28: ^0.1.2
 
 dev_dependencies:
   flutter_test:
