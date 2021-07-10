@@ -89,22 +89,30 @@ class YouTubeService {
       for (var video in jsonData['info']['formats']) {
         String? videoID = video['format_id'];
 
-        VideoFormat videoOption = VideoFormat(
-            video['format_id'],
-            video['filesize'] != null ? video['filesize'] : 0,
-            videoType.containsKey(videoID) ? videoType['$videoID'] : 'Unknown',
-            video['ext'] != null ? video['ext'] : 'Unknown',
-            video['url']);
-        videoOptions.add(videoOption);
+        if (video['format_id'] == '249' ||
+            video['format_id'] == '250' ||
+            video['format_id'] == '251' ||
+            video['format_id'] == '140' ||
+            video['ext'] == 'mp4') {
+          VideoFormat videoOption = VideoFormat(
+              video['format_id'],
+              video['filesize'] != null ? video['filesize'] : 0,
+              videoType.containsKey(videoID)
+                  ? videoType['$videoID']
+                  : 'Unknown',
+              video['ext'] != null ? video['ext'] : 'Unknown',
+              video['url']);
+          videoOptions.add(videoOption);
+        }
+        VideoDetails videoDetail = VideoDetails(
+            jsonData['url'],
+            jsonData['info']['title'],
+            jsonData['info']['thumbnail'],
+            videoOptions,
+            true,
+            'Successfull');
+        videoDetails.add(videoDetail);
       }
-      VideoDetails videoDetail = VideoDetails(
-          jsonData['url'],
-          jsonData['info']['title'],
-          jsonData['info']['thumbnail'],
-          videoOptions,
-          true,
-          'Successfull');
-      videoDetails.add(videoDetail);
     } else {
       VideoDetails videoDetail = VideoDetails(
           'Null', 'Null', 'Null', videoOptions, false, 'Invalid Url');

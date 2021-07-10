@@ -149,7 +149,7 @@ class _HomePageState extends State<HomePage> {
                                   Text(filesize(video.videoFormat[index].size)),
                               onTap: () {
                                 downloadService.downloadRequest(
-                                    video.url,
+                                    video.videoFormat[index].url,
                                     video.title +
                                         video.videoFormat[index].quality,
                                     video.videoFormat[index].ext);
@@ -176,7 +176,7 @@ class _HomePageState extends State<HomePage> {
                                   Text(filesize(video.videoFormat[index].size)),
                               onTap: () {
                                 downloadService.downloadRequest(
-                                    video.url,
+                                    video.videoFormat[index].url,
                                     video.title +
                                         video.videoFormat[index].quality,
                                     video.videoFormat[index].ext);
