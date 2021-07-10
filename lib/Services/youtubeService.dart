@@ -39,8 +39,10 @@ class YouTubeService {
     '399': '1080P HDR (60FPS)',
     '303': '1080P (60FPS)',
     '299': '1080P (60FPS)',
+    '248': '1080P HDR (30FPS)',
     '699': '1080P HDR (60FPS)',
     '335': '1080P HDR (60FPS)',
+    '137': '1080P HDR (30FPS)',
     '400': '1440P HDR (60FPS)',
     '308': '1440P (60FPS)',
     '700': '1440P HDR (60FPS)',
@@ -80,49 +82,32 @@ class YouTubeService {
 
     var jsonData = json.decode(response.toString());
     if (jsonData.containsKey('error')) {
-      VideoDetails videoDetail = VideoDetails('Null', 'Null', 'Null',
-          videoOptions, audioOptions, false, jsonData['error']);
+      VideoDetails videoDetail = VideoDetails(
+          'Null', 'Null', 'Null', videoOptions, false, jsonData['error']);
       videoDetails.add(videoDetail);
     } else if (jsonData['info'].containsKey('formats')) {
       for (var video in jsonData['info']['formats']) {
         String? videoID = video['format_id'];
-        if (video['format_id'] == '249' ||
-            video['format_id'] == '250' ||
-            video['format_id'] == '140' ||
-            video['format_id'] == '251') {
-          AudioFormat audioOption = AudioFormat(
-              video['format_id'],
-              video['filesize'] != null ? video['filesize'] : 0,
-              videoType.containsKey(videoID)
-                  ? videoType['$videoID']
-                  : 'Unknown',
-              video['ext'],
-              video['url']);
-          audioOptions.add(audioOption);
-        } else {
-          VideoFormat videoOption = VideoFormat(
-              video['format_id'],
-              video['filesize'] != null ? video['filesize'] : 0,
-              videoType.containsKey(videoID)
-                  ? videoType['$videoID']
-                  : 'Unknown',
-              video['ext'] != null ? video['ext'] : 'Unknown',
-              video['url']);
-          videoOptions.add(videoOption);
-        }
+
+        VideoFormat videoOption = VideoFormat(
+            video['format_id'],
+            video['filesize'] != null ? video['filesize'] : 0,
+            videoType.containsKey(videoID) ? videoType['$videoID'] : 'Unknown',
+            video['ext'] != null ? video['ext'] : 'Unknown',
+            video['url']);
+        videoOptions.add(videoOption);
       }
       VideoDetails videoDetail = VideoDetails(
           jsonData['url'],
           jsonData['info']['title'],
           jsonData['info']['thumbnail'],
           videoOptions,
-          audioOptions,
           true,
           'Successfull');
       videoDetails.add(videoDetail);
     } else {
-      VideoDetails videoDetail = VideoDetails('Null', 'Null', 'Null',
-          videoOptions, audioOptions, false, 'Invalid Url');
+      VideoDetails videoDetail = VideoDetails(
+          'Null', 'Null', 'Null', videoOptions, false, 'Invalid Url');
       videoDetails.add(videoDetail);
     }
 

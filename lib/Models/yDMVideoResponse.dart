@@ -1,12 +1,12 @@
 class VideoDetails {
   VideoDetails(this.url, this.title, this.thumbnails, this.videoFormat,
-      this.audioFormat, this.status, this.message);
+      this.status, this.message);
 
   String url;
   String title;
   String thumbnails;
   List<VideoFormat> videoFormat;
-  List<AudioFormat> audioFormat;
+  // List<AudioFormat> audioFormat;
   bool status;
   String message;
 }
